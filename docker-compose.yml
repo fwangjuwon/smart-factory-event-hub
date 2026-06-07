@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: factory-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: factory
+      RABBITMQ_DEFAULT_PASS: factory123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgresql:
+    image: postgres:15
+    container_name: factory-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: factory_db
+      POSTGRES_USER: factory
+      POSTGRES_PASSWORD: factory123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U factory -d factory_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mes-service:
+    build: ./mes-service
+    container_name: factory-mes-service
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/factory_db
+      SPRING_DATASOURCE_USERNAME: factory
+      SPRING_DATASOURCE_PASSWORD: factory123
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: factory
+      SPRING_RABBITMQ_PASSWORD: factory123
+      TZ: Asia/Seoul
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+
+  equipment-simulator:
+    build: ./equipment-simulator
+    container_name: factory-simulator
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: factory
+      SPRING_RABBITMQ_PASSWORD: factory123
+      TZ: Asia/Seoul
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mes-service:
+        condition: service_started
+
+  dashboard:
+    build: ./dashboard
+    container_name: factory-dashboard
+    ports:
+      - "3000:80"
+    depends_on:
+      - mes-service
+
+volumes:
+  postgres_data:
