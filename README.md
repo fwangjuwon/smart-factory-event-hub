@@ -101,15 +101,20 @@ Site (공장)
 **대시보드 (일별 통계)**
 - 날짜 선택 → 사이트별 평균 가동률·수율·ALERT/WARNING 건수 집계
 - 대공정 단위 상세 breakdown 및 바 차트
+<img width="1912" height="914" alt="image" src="https://github.com/user-attachments/assets/b9a16035-16ce-42ee-a5ac-303133423ab9" />
+
 
 **공정 모니터링 (실시간)**
 - 아코디언 트리(Site > 대공정 > 라인 > 소공정)로 계층 탐색
 - 선택 범위 내 설비 카드(상태·위치·최근 이벤트) 실시간 갱신 (3초 폴링)
 - WARNING 목록 / ALERT 목록 위치 정보 포함 표시
+<img width="1897" height="918" alt="image" src="https://github.com/user-attachments/assets/329c9f88-0496-4bc4-8220-4a44c920e76d" />
 
 **스펙 관리**
 - 설비별·이벤트 유형별 경계값·오차율 조회 및 수정
 - 신규 설비 등록 시 공정 계층에 자동 연결 (equipment 테이블 자동 생성)
+<img width="1897" height="918" alt="image" src="https://github.com/user-attachments/assets/e1bfced7-a6c4-4b54-9921-26d68113c11a" />
+
 
 ---
 
